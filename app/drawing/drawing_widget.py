@@ -26,11 +26,15 @@ class DrawingWidget(QWidget):
 
         self.view: ProjectedView | None = None
 
+    # ---------------------------------------------------------
+
     def set_projected_view(self, view: ProjectedView):
 
         self.view = view
 
         self.update()
+
+    # ---------------------------------------------------------
 
     def paintEvent(self, event):
 
@@ -41,18 +45,25 @@ class DrawingWidget(QWidget):
         if self.view is None:
             return
 
-        pen = QPen(Qt.yellow)
+        if self.view.bounding_box is not None:
 
+            self.mapper.fit(
+                self.view.bounding_box,
+                self.width(),
+                self.height(),
+            )
+
+        pen = QPen(Qt.yellow)
         pen.setWidth(2)
 
         painter.setPen(pen)
 
         for entity in self.view.visible_geometry:
 
-            if isinstance(entity, Line2D):
+            if not isinstance(entity, Line2D):
+                continue
 
-                x1, y1 = self.mapper.map(entity.start)
+            x1, y1 = self.mapper.map(entity.start)
+            x2, y2 = self.mapper.map(entity.end)
 
-                x2, y2 = self.mapper.map(entity.end)
-
-                painter.drawLine(x1, y1, x2, y2)
+            painter.drawLine(x1, y1, x2, y2)

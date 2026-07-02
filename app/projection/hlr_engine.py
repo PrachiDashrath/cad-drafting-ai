@@ -28,6 +28,10 @@ from app.projection.projected_view import (
     ProjectedView,
     ViewType,
 )
+from app.projection.geometry2d import (
+    Line2D,
+    BoundingBox2D,
+)
 
 
 class HLREngine:
@@ -36,6 +40,8 @@ class HLREngine:
 
         self.extractor = EdgeExtractor()
         self.converter = CurveConverter()
+
+    # ------------------------------------------------------------
 
     def generate(
         self,
@@ -48,18 +54,17 @@ class HLREngine:
         algo = HLRBRep_Algo()
 
         algo.Add(shape)
-
         algo.Projector(projector)
-
         algo.Update()
-
         algo.Hide()
 
         hlr = HLRBRep_HLRToShape(algo)
 
         view = ProjectedView(view_type=view_type)
 
-        # ---------- Visible Geometry ----------
+        # --------------------------------------------------------
+        # Visible Geometry
+        # --------------------------------------------------------
 
         visible_edges = self.extractor.extract(
             hlr.VCompound()
@@ -72,7 +77,9 @@ class HLREngine:
             if geometry is not None:
                 view.visible_geometry.append(geometry)
 
-        # ---------- Hidden Geometry ----------
+        # --------------------------------------------------------
+        # Hidden Geometry
+        # --------------------------------------------------------
 
         hidden_edges = self.extractor.extract(
             hlr.HCompound()
@@ -85,7 +92,49 @@ class HLREngine:
             if geometry is not None:
                 view.hidden_geometry.append(geometry)
 
+        # --------------------------------------------------------
+        # Compute Bounding Box
+        # --------------------------------------------------------
+
+        self._compute_bounding_box(view)
+
         return view
+
+    # ------------------------------------------------------------
+
+    def _compute_bounding_box(
+        self,
+        view: ProjectedView,
+    ) -> None:
+
+        xs = []
+        ys = []
+
+        for entity in view.visible_geometry:
+
+            if isinstance(entity, Line2D):
+
+                xs.extend([
+                    entity.start.x,
+                    entity.end.x,
+                ])
+
+                ys.extend([
+                    entity.start.y,
+                    entity.end.y,
+                ])
+
+        if not xs:
+            return
+
+        view.bounding_box = BoundingBox2D(
+            min_x=min(xs),
+            min_y=min(ys),
+            max_x=max(xs),
+            max_y=max(ys),
+        )
+
+    # ------------------------------------------------------------
 
     def _create_projector(
         self,
