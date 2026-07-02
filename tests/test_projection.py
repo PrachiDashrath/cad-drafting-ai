@@ -17,8 +17,8 @@ shape = reader.OneShape()
 
 engine = ProjectionEngine()
 
-view = engine.front(shape)
+front = engine.front(shape)
 
-print("Visible:", len(view.visible_geometry))
-
-print("Hidden:", len(view.hidden_geometry))
+print("Visible Geometry :", len(front.visible_geometry))
+print("Hidden Geometry  :", len(front.hidden_geometry))
+print("Total Geometry   :", front.total_entities)
