@@ -12,6 +12,7 @@ from PySide6.QtWidgets import QWidget
 
 from app.drawing.coordinate_mapper import CoordinateMapper
 from app.drawing.drawing_sheet import DrawingSheet
+from app.drawing.layout_engine import LayoutEngine
 from app.projection.geometry2d import Line2D
 
 
@@ -24,17 +25,13 @@ class DrawingWidget(QWidget):
 
         self.sheet: DrawingSheet | None = None
 
+        self.layout_engine = LayoutEngine()
+
     # ---------------------------------------------------------
 
     def set_drawing_sheet(self, sheet: DrawingSheet):
 
         self.sheet = sheet
-
-        print("DrawingSheet received")
-
-        if sheet is not None:
-            print("Views:", len(sheet.views))
-
         self.update()
 
     # ---------------------------------------------------------
@@ -45,52 +42,150 @@ class DrawingWidget(QWidget):
 
         painter.fillRect(self.rect(), QColor(35, 35, 35))
 
+        #
+        # Sheet
+        #
+
+        sheet_margin = 20
+
+        sheet_x = sheet_margin
+        sheet_y = sheet_margin
+
+        sheet_w = self.width() - 2 * sheet_margin
+        sheet_h = self.height() - 2 * sheet_margin
+
+        painter.setPen(QPen(Qt.white, 2))
+        painter.drawRect(sheet_x, sheet_y, sheet_w, sheet_h)
+
+        #
+        # Title block
+        #
+
+        title_h = 90
+
+        painter.drawLine(
+            sheet_x,
+            sheet_y + sheet_h - title_h,
+            sheet_x + sheet_w,
+            sheet_y + sheet_h - title_h,
+        )
+
+        painter.drawLine(
+            sheet_x + sheet_w - 220,
+            sheet_y + sheet_h - title_h,
+            sheet_x + sheet_w - 220,
+            sheet_y + sheet_h,
+        )
+
         if self.sheet is None:
             return
 
-        margin = 20
-
-        w = self.width()
-        h = self.height()
-
         #
-        # Layout
+        # Automatic layout
         #
 
-        self._draw_view(
-            painter,
-            self.sheet.front,
-            margin,
-            h // 2,
-            w // 2 - 2 * margin,
-            h // 2 - 2 * margin,
+        layout = self.layout_engine.generate(
+            self.sheet,
+            sheet_w,
+            sheet_h - title_h,
         )
+
+        #
+        # Draw all views
+        #
 
         self._draw_view(
             painter,
             self.sheet.top,
-            margin,
-            margin,
-            w // 2 - 2 * margin,
-            h // 3,
+            layout["top"].x + sheet_x,
+            layout["top"].y + sheet_y,
+            layout["top"].width,
+            layout["top"].height,
+        )
+
+        self._draw_view(
+            painter,
+            self.sheet.front,
+            layout["front"].x + sheet_x,
+            layout["front"].y + sheet_y,
+            layout["front"].width,
+            layout["front"].height,
         )
 
         self._draw_view(
             painter,
             self.sheet.right,
-            w // 2,
-            h // 2,
-            w // 2 - 2 * margin,
-            h // 2 - 2 * margin,
+            layout["right"].x + sheet_x,
+            layout["right"].y + sheet_y,
+            layout["right"].width,
+            layout["right"].height,
         )
 
         self._draw_view(
             painter,
             self.sheet.isometric,
-            w // 2,
-            margin,
-            w // 2 - 2 * margin,
-            h // 3,
+            layout["isometric"].x + sheet_x,
+            layout["isometric"].y + sheet_y,
+            layout["isometric"].width,
+            layout["isometric"].height,
+        )
+
+        #
+        # Labels
+        #
+
+        painter.setPen(Qt.white)
+
+        painter.drawText(
+            layout["top"].x + sheet_x + 10,
+            layout["top"].y + sheet_y - 5,
+            "TOP",
+        )
+
+        painter.drawText(
+            layout["front"].x + sheet_x + 10,
+            layout["front"].y + sheet_y - 5,
+            "FRONT",
+        )
+
+        painter.drawText(
+            layout["right"].x + sheet_x + 10,
+            layout["right"].y + sheet_y - 5,
+            "RIGHT",
+        )
+
+        painter.drawText(
+            layout["isometric"].x + sheet_x + 10,
+            layout["isometric"].y + sheet_y - 5,
+            "ISOMETRIC",
+        )
+
+        #
+        # Title block
+        #
+
+        painter.drawText(
+            sheet_x + 20,
+            sheet_y + sheet_h - 55,
+            f"Units : {self.sheet.units}",
+        )
+
+        painter.drawText(
+            sheet_x + 20,
+            sheet_y + sheet_h - 30,
+            f"Scale : {self.sheet.scale}",
+        )
+
+        painter.drawText(
+            sheet_x + sheet_w - 200,
+            sheet_y + sheet_h - 55,
+            "CAD Drafting AI",
+        )
+
+        painter.drawText(
+            sheet_x + sheet_w - 200,
+            sheet_y + sheet_h - 30,
+            "Sheet : A3",
         )
 
     # ---------------------------------------------------------
@@ -134,13 +229,12 @@ class DrawingWidget(QWidget):
 
         for entity in view.hidden_geometry:
 
-            if not isinstance(entity, Line2D):
-                continue
+            if isinstance(entity, Line2D):
 
-            x1, y1 = mapper.map(entity.start)
-            x2, y2 = mapper.map(entity.end)
+                x1, y1 = mapper.map(entity.start)
+                x2, y2 = mapper.map(entity.end)
 
-            painter.drawLine(x1, y1, x2, y2)
+                painter.drawLine(x1, y1, x2, y2)
 
         #
         # Visible lines
@@ -153,10 +247,9 @@ class DrawingWidget(QWidget):
 
         for entity in view.visible_geometry:
 
-            if not isinstance(entity, Line2D):
-                continue
+            if isinstance(entity, Line2D):
 
-            x1, y1 = mapper.map(entity.start)
-            x2, y2 = mapper.map(entity.end)
+                x1, y1 = mapper.map(entity.start)
+                x2, y2 = mapper.map(entity.end)
 
-            painter.drawLine(x1, y1, x2, y2)
+                painter.drawLine(x1, y1, x2, y2)
