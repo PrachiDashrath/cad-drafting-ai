@@ -136,35 +136,37 @@ class ApplicationController(QObject):
 
     def _on_document_loaded(self, doc: CADDocument):
 
-        self._doc = doc
+    	self._doc = doc
 
-        self._window.viewer.erase_all()
+    	#
+    	# Display 3D model
+    	#
 
-        self._window.viewer.display_shape(doc.shape)
+    	self._window.viewer.erase_all()
 
-        self._camera.fit_all()
+    	self._window.viewer.display_shape(doc.shape)
 
-        #
-        # NEW
-        #
+    	self._camera.fit_all()
 
-        try:
+    	#
+    	# Generate complete drawing sheet
+    	#
 
-            front = self._projection.generate_front_view(
-                doc.shape
-            )
+    	try:
 
-            self._window.drawing.set_projected_view(front)
+        	sheet = self._projection.generate_sheet(
+            	doc.shape
+        	)
 
-            log.info(
-                "Front projection generated."
-            )
+        	self._window.drawing.set_drawing_sheet(sheet)
 
-        except Exception as e:
+        	log.info("Drawing sheet generated.")
 
-            log.exception(e)
+    	except Exception as e:
 
-        self._window.on_document_loaded(doc)
+        	log.exception(e)
+
+    	self._window.on_document_loaded(doc)
 
     # ------------------------------------------------------------
 

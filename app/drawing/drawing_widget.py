@@ -1,24 +1,16 @@
 """
 drawing_widget.py
-
-Simple 2D engineering drawing viewer.
 """
 
 from __future__ import annotations
 
 from PySide6.QtCore import Qt
-
-from PySide6.QtGui import (
-    QColor,
-    QPainter,
-    QPen,
-)
-
+from PySide6.QtGui import QColor, QPainter, QPen
 from PySide6.QtWidgets import QWidget
 
 from app.drawing.coordinate_mapper import CoordinateMapper
+from app.drawing.drawing_sheet import DrawingSheet
 from app.projection.geometry2d import Line2D
-from app.projection.projected_view import ProjectedView
 
 
 class DrawingWidget(QWidget):
@@ -30,13 +22,13 @@ class DrawingWidget(QWidget):
 
         self.mapper = CoordinateMapper()
 
-        self.view: ProjectedView | None = None
+        self.sheet: DrawingSheet | None = None
 
     # ---------------------------------------------------------
 
-    def set_projected_view(self, view: ProjectedView):
+    def set_drawing_sheet(self, sheet: DrawingSheet):
 
-        self.view = view
+        self.sheet = sheet
 
         self.update()
 
@@ -48,13 +40,23 @@ class DrawingWidget(QWidget):
 
         painter.fillRect(self.rect(), QColor(35, 35, 35))
 
-        if self.view is None:
+        if self.sheet is None:
             return
 
-        if self.view.bounding_box is not None:
+        #
+        # Temporary:
+        # draw only the front view from the sheet.
+        #
+
+        view = self.sheet.front
+
+        if view is None:
+            return
+
+        if view.bounding_box is not None:
 
             self.mapper.fit(
-                self.view.bounding_box,
+                view.bounding_box,
                 self.width(),
                 self.height(),
             )
@@ -63,21 +65,18 @@ class DrawingWidget(QWidget):
         # Hidden lines
         #
 
-        hidden_pen = QPen(QColor(150, 150, 150))
+        pen = QPen(QColor(150, 150, 150))
+        pen.setStyle(Qt.DashLine)
+        pen.setWidth(1)
 
-        hidden_pen.setWidth(1)
+        painter.setPen(pen)
 
-        hidden_pen.setStyle(Qt.DashLine)
-
-        painter.setPen(hidden_pen)
-
-        for entity in self.view.hidden_geometry:
+        for entity in view.hidden_geometry:
 
             if not isinstance(entity, Line2D):
                 continue
 
             x1, y1 = self.mapper.map(entity.start)
-
             x2, y2 = self.mapper.map(entity.end)
 
             painter.drawLine(x1, y1, x2, y2)
@@ -86,19 +85,17 @@ class DrawingWidget(QWidget):
         # Visible lines
         #
 
-        visible_pen = QPen(Qt.yellow)
+        pen = QPen(Qt.yellow)
+        pen.setWidth(2)
 
-        visible_pen.setWidth(2)
+        painter.setPen(pen)
 
-        painter.setPen(visible_pen)
-
-        for entity in self.view.visible_geometry:
+        for entity in view.visible_geometry:
 
             if not isinstance(entity, Line2D):
                 continue
 
             x1, y1 = self.mapper.map(entity.start)
-
             x2, y2 = self.mapper.map(entity.end)
 
             painter.drawLine(x1, y1, x2, y2)
