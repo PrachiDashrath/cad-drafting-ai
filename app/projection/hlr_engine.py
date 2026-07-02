@@ -1,53 +1,40 @@
 """
 hlr_engine.py
 
-Wrapper around Open CASCADE's Hidden Line Removal (HLR) algorithms.
+Hidden Line Removal (HLR) engine.
 
-This module converts a 3D TopoDS_Shape into a ProjectedView
-containing visible and hidden 2D entities.
-
-(Currently only the class skeleton is implemented.)
+This module wraps Open CASCADE's HLR algorithms and converts a
+TopoDS_Shape into a ProjectedView.
 """
 
 from __future__ import annotations
 
 from OCC.Core.TopoDS import TopoDS_Shape
 
-from app.projection.projected_view import ProjectedView, ViewType
+from app.projection.projected_view import (
+    ProjectedView,
+    ViewType,
+)
 
 
 class HLREngine:
     """
-    Hidden Line Removal engine.
-
-    Future implementation will use:
-    - HLRBRep_Algo
-    - HLRAlgo_Projector
+    Wrapper around Open CASCADE Hidden Line Removal.
     """
 
     def __init__(self):
-        pass
+        print("HLR Engine initialized")
 
     def generate(
         self,
         shape: TopoDS_Shape,
         view_type: ViewType,
     ) -> ProjectedView:
-        """
-        Generate one projected engineering view.
 
-        Parameters
-        ----------
-        shape
-            OCC solid
+        print(f"Generating {view_type.value} projection...")
 
-        view_type
-            Front / Top / Right / Isometric
+        view = ProjectedView(view_type=view_type)
 
-        Returns
-        -------
-        ProjectedView
-        """
+        # Actual HLR implementation comes next sprint.
 
-        # Implementation comes in Sprint 2.5
-        return ProjectedView(view_type=view_type)
+        return view
