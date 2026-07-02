@@ -14,7 +14,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from math import sqrt
 
+class Geometry2D:
+    """
+    Base class for every 2D geometry entity.
+    """
 
+    pass
 # ---------------------------------------------------------------------
 # Basic Geometry
 # ---------------------------------------------------------------------
@@ -30,7 +35,7 @@ class Point2D:
 
 
 @dataclass(slots=True)
-class Line2D:
+class Line2D(Geometry2D):
     start: Point2D
     end: Point2D
 
@@ -40,13 +45,13 @@ class Line2D:
 
 
 @dataclass(slots=True)
-class Circle2D:
+class Circle2D(Geometry2D):
     center: Point2D
     radius: float
 
 
 @dataclass(slots=True)
-class Arc2D:
+class Arc2D(Geometry2D):
     center: Point2D
     radius: float
     start_angle: float
