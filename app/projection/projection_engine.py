@@ -1,31 +1,58 @@
 """
 projection_engine.py
 
-High-level interface for generating engineering drawing views.
-"""
+High-level projection engine.
 
-from __future__ import annotations
+This class coordinates the entire projection pipeline:
+
+STEP Shape
+    ↓
+HLR
+    ↓
+Edge Extraction
+    ↓
+Curve Conversion
+    ↓
+ProjectedView
+"""
 
 from OCC.Core.TopoDS import TopoDS_Shape
 
 from app.projection.hlr_engine import HLREngine
-from app.projection.projected_view import ProjectedView, ViewType
+from app.projection.edge_extractor import EdgeExtractor
+from app.projection.curve_converter import CurveConverter
+from app.projection.projected_view import (
+    ProjectedView,
+    ViewType,
+)
 
 
 class ProjectionEngine:
-    """Facade over the HLR engine."""
 
     def __init__(self):
-        self._hlr = HLREngine()
 
-    def front(self, shape: TopoDS_Shape) -> ProjectedView:
-        return self._hlr.generate(shape, ViewType.FRONT)
+        self.hlr = HLREngine()
+        self.extractor = EdgeExtractor()
+        self.converter = CurveConverter()
 
-    def top(self, shape: TopoDS_Shape) -> ProjectedView:
-        return self._hlr.generate(shape, ViewType.TOP)
+    def front(self, shape: TopoDS_Shape):
 
-    def right(self, shape: TopoDS_Shape) -> ProjectedView:
-        return self._hlr.generate(shape, ViewType.RIGHT)
+        return self._generate(shape, ViewType.FRONT)
 
-    def isometric(self, shape: TopoDS_Shape) -> ProjectedView:
-        return self._hlr.generate(shape, ViewType.ISOMETRIC)
+    def top(self, shape: TopoDS_Shape):
+
+        return self._generate(shape, ViewType.TOP)
+
+    def right(self, shape: TopoDS_Shape):
+
+        return self._generate(shape, ViewType.RIGHT)
+
+    def isometric(self, shape: TopoDS_Shape):
+
+        return self._generate(shape, ViewType.ISOMETRIC)
+
+    def _generate(self, shape, view_type):
+
+        view = self.hlr.generate(shape, view_type)
+
+        return view
