@@ -43,13 +43,10 @@ class ProjectedView:
 
     view_type: ViewType
 
-    visible_lines: List[Line2D] = field(default_factory=list)
-    hidden_lines: List[Line2D] = field(default_factory=list)
+    from app.projection.geometry2d import Geometry2D
 
-    visible_arcs: List[Arc2D] = field(default_factory=list)
-    hidden_arcs: List[Arc2D] = field(default_factory=list)
-
-    circles: List[Circle2D] = field(default_factory=list)
+    visible_geometry: list[Geometry2D] = field(default_factory=list)
+    hidden_geometry: list[Geometry2D] = field(default_factory=list)
 
     bounding_box: BoundingBox2D | None = None
 
@@ -61,18 +58,12 @@ class ProjectedView:
     @property
     def total_entities(self) -> int:
         return (
-            len(self.visible_lines)
-            + len(self.hidden_lines)
-            + len(self.visible_arcs)
-            + len(self.hidden_arcs)
-            + len(self.circles)
-        )
+	len(self.visible_geometry)
+	+ len(self.hidden_geometry)
+	)
 
     def clear(self) -> None:
         """Remove all projected entities."""
 
-        self.visible_lines.clear()
-        self.hidden_lines.clear()
-        self.visible_arcs.clear()
-        self.hidden_arcs.clear()
-        self.circles.clear()
+        self.visible_geometry.clear()
+	self.hidden_geometry.clear()
