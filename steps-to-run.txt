@@ -1,0 +1,58 @@
+C:\Windows\System32>C:\Users\PRACHI\miniconda3\condabin\conda.bat activate cad_env
+
+(cad_env) C:\Windows\System32>cd /d C:\Users\PRACHI\Projects\cad_drafting_ai
+
+(cad_env) C:\Users\PRACHI\Projects\cad_drafting_ai>python -m app.main
+17:44:00  INFO      OCC.Display.backend  —  backend loaded: pyside6
+17:44:00  INFO      __main__  —  Starting CAD Drafting AI
+####### 3D rendering pipe initialisation #####
+Display3d class initialization starting ...
+Aspect_DisplayConnection created.
+OpenGl_GraphicDriver created.
+V3d_Viewer created.
+AIS_InteractiveContext created.
+V3d_View created
+Graphic3d_Camera created
+Graphic3d_StructureManager created
+17:44:00  DEBUG     app.gui.occ_viewer  —  OccViewer initialized.
+17:44:00  INFO      app.gui.main_window  —  MainWindow ready
+17:44:00  DEBUG     app.viewer.display_manager  —  DisplayManager initialised
+17:44:00  DEBUG     app.viewer.camera_controller  —  CameraController initialised
+17:44:00  INFO      app.controller  —  ApplicationController wired to MainWindow
+17:44:00  INFO      __main__  —  MainWindow shown
+WNT window created.
+Display3d class successfully initialized.
+#########################################
+OpenGl information:
+  GLvendor: Mesa
+  GLdevice: llvmpipe (LLVM 22.1.1, 256 bits)
+  GLversion: 4.5 (Compatibility Profile) Mesa 26.0.3
+  GLSLversion: 4.50
+  Max texture size: 16384
+  Max FBO dump size: 16384x16384
+  Max combined texture units: 160
+  Max MSAA samples: 8
+  Viewport: 1600x903
+  Window buffer: RGB8 ALPHA0 DEPTH24 STENCIL8
+  ResolutionRatio: 1
+  FBO buffer: GL_SRGB8_ALPHA8 GL_DEPTH24_STENCIL8
+17:44:16  INFO      app.viewer.step_loader  —  Reading STEP file: C:/Users/PRACHI/OneDrive/Dokumen/SKF/1691830/prt0002.stp
+17:44:16  INFO      app.viewer.step_loader  —  prt0002.stp  |  Faces: 69  Edges: 330  Vertices: 660  |  mm
+17:44:16  DEBUG     app.viewer.camera_controller  —  Camera: FitAll
+17:44:16  INFO      app.controller  —  Model loaded: prt0002.stp  |  Faces: 69  Edges: 330  Vertices: 660  |  mm
+17:44:28  INFO      OCC.Display.qtDisplay  —  key: code 16777249 not mapped to any function
+17:44:30  DEBUG     app.viewer.camera_controller  —  Camera: FitAll
+17:44:31  DEBUG     app.viewer.camera_controller  —  Camera: FRONT
+17:44:34  DEBUG     app.viewer.camera_controller  —  Camera: TOP
+17:44:37  DEBUG     app.viewer.camera_controller  —  Camera: FitAll
+17:44:38  INFO      OCC.Display.qtDisplay  —  key: code 16777249 not mapped to any function
+17:44:46  DEBUG     app.gui.occ_viewer  —  Display mode changed to SHADED_WITH_EDGES
+17:44:48  DEBUG     app.gui.occ_viewer  —  Display mode changed to WIREFRAME
+17:44:49  DEBUG     app.gui.occ_viewer  —  Display mode changed to WIREFRAME
+17:44:50  DEBUG     app.gui.occ_viewer  —  Display mode changed to SHADED_WITH_EDGES
+17:44:57  DEBUG     app.viewer.camera_controller  —  Camera: FRONT
+17:45:00  DEBUG     app.viewer.camera_controller  —  Camera: FitAll
+17:45:03  INFO      OCC.Display.qtDisplay  —  key: code 16777249 not mapped to any function
+17:45:04  DEBUG     app.viewer.camera_controller  —  Camera: FitAll
+
+(cad_env) C:\Users\PRACHI\Projects\cad_drafting_ai>
