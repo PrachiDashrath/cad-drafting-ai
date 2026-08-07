@@ -1,15 +1,13 @@
 """
 projection_service.py
 
-High-level service used by the GUI.
-
-The GUI never talks directly to HLR or ProjectionEngine.
+High-level projection service.
 """
 
 from OCC.Core.TopoDS import TopoDS_Shape
 
+from app.drawing.drawing_sheet import DrawingSheet
 from app.projection.projection_engine import ProjectionEngine
-from app.projection.projected_view import ProjectedView
 
 
 class ProjectionService:
@@ -18,9 +16,41 @@ class ProjectionService:
 
         self.engine = ProjectionEngine()
 
+    # ---------------------------------------------------------
+
+    def generate_sheet(
+        self,
+        shape: TopoDS_Shape,
+    ) -> DrawingSheet:
+
+        sheet = DrawingSheet()
+
+        #
+        # Generate views
+        #
+
+        sheet.front = self.engine.front(shape)
+        sheet.top = self.engine.top(shape)
+        sheet.right = self.engine.right(shape)
+        sheet.isometric = self.engine.isometric(shape)
+
+        #
+        # Store all views
+        #
+
+        sheet.views = [
+            sheet.front,
+            sheet.top,
+            sheet.right,
+            sheet.isometric,
+        ]
+
+        return sheet
+
+    # ---------------------------------------------------------
+
     def generate_front_view(
         self,
         shape: TopoDS_Shape,
-    ) -> ProjectedView:
-
+    ):
         return self.engine.front(shape)
